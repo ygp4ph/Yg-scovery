@@ -14,6 +14,7 @@ func main() {
 	var d int
 	var onlyExternal, onlyInternal, h bool
 	var output string
+	// Définition des flags et leurs valeurs par défaut
 	flag.StringVar(&u, "u", "", "")
 	flag.StringVar(&u, "url", "", "")
 	flag.IntVar(&d, "d", 3, "")
@@ -27,6 +28,7 @@ func main() {
 	flag.BoolVar(&h, "h", false, "")
 	flag.BoolVar(&h, "help", false, "")
 
+	// hehe
 	banner := func() {
 		color.Cyan(`
 _____.___.                  _________                                      

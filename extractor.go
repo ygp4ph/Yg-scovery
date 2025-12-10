@@ -5,12 +5,14 @@ import (
 	"strings"
 )
 
+// regex pour extraire les liens
 var (
 	urlRegex  = regexp.MustCompile(`https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(?:/[^"'\s<>` + "`" + `]*)?`)
 	pathRegex = regexp.MustCompile(`["'](\.?\.?/[^"'\s<>` + "`" + `]+)["']`)
 	attrRegex = regexp.MustCompile(`(href|src)=["']([^"']+)["']`)
 )
 
+// Extract extrait les liens d'une page web.
 func Extract(content string) []string {
 	seen := make(map[string]bool)
 	var found []string

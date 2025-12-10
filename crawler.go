@@ -14,6 +14,7 @@ import (
 	"github.com/fatih/color"
 )
 
+// Config représente les paramètres de configuration du crawler.
 type Config struct {
 	TargetURL    string
 	MaxDepth     int
@@ -22,6 +23,7 @@ type Config struct {
 	OutputPath   string
 }
 
+// Crawler représente un crawler web.
 type Crawler struct {
 	Config  Config
 	Client  *http.Client
@@ -30,6 +32,7 @@ type Crawler struct {
 	Results []string
 }
 
+// New crée un nouveau crawler.
 func New(cfg Config) *Crawler {
 	return &Crawler{
 		Config: cfg,
@@ -43,8 +46,10 @@ func New(cfg Config) *Crawler {
 	}
 }
 
+// Start lance le crawler.
 func (c *Crawler) Start() error { return c.crawl(c.Config.TargetURL, 0) }
 
+// crawl effectue la recherche.
 func (c *Crawler) crawl(rawURL string, depth int) error {
 	if depth > c.Config.MaxDepth {
 		return nil
@@ -101,6 +106,7 @@ func (c *Crawler) crawl(rawURL string, depth int) error {
 	return nil
 }
 
+// SaveJSON sauvegarde les résultats dans un fichier JSON.
 func (c *Crawler) SaveJSON() error {
 	if c.Config.OutputPath == "" {
 		return nil
