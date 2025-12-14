@@ -44,7 +44,7 @@ go install
 ### Exemple
 
 ```text
-~/Projets/Yg-scovery $ ./yg-scovery -u https://trainplay.fr/ -i -d 2
+~/Projets/Yg-scovery $ ./yg-scovery -u https://ygp4ph.me -i
 
 _____.___.                  _________                                      
 \__  |   | ____            /   _____/ ____  _______  __ ___________ ___.__.
@@ -52,30 +52,25 @@ _____.___.                  _________
  \____   / /_/  > /_____/  /        \  \__(  <_> )   /\  ___/|  | \/\___  |
  / ______\___  /          /_______  /\___  >____/ \_/  \___  >__|   / ____|
  \/     /_____/                   \/     \/                \/       \/      v1.0.0
-
-
-[INF] Scanning https://trainplay.fr/ (Depth: 2)
+ 
+[INF] Scanning https://ygp4ph.me (Depth: 3)
 [INF] Filter: Internal links only
-[INT] https://trainplay.fr/main.js
-[INT] https://trainplay.fr
-[INT] https://trainplay.fr/main.js
-[INT] https://trainplay.fr/dist/
-[INT] https://trainplay.fr/dist/main.js
-[INT] https://trainplay.fr/main.js
-[INT] https://trainplay.fr/
-[INT] https://trainplay.fr/register
-[INT] https://trainplay.fr/login
-[INT] https://trainplay.fr/img/logo.jpg
-[INT] https://trainplay.fr/MyNews
-[INT] https://trainplay.fr/g,s=
-[INT] https://trainplay.fr/users/authenticate
-[INT] https://trainplay.fr/users/register
-[INT] https://trainplay.fr/users
-[INT] https://trainplay.fr/users/
-[INT] https://trainplay.fr/
-[INT] https://trainplay.fr/%3e%3c/svg%3e
-[INT] https://trainplay.fr/g,
-[INT] https://trainplay.fr/page
-[INT] https://trainplay.fr/a/i
-[INT] https://trainplay.fr/a/b
+[INT] https://ygp4ph.me/assets/pdp_anime.mp4
+[INT] https://ygp4ph.me/T
+[INT] https://ygp4ph.me/%EE
+[INT] https://ygp4ph.me/%CD%BB%EB
+[INT] https://ygp4ph.me/%A6%BD
+[INT] https://ygp4ph.me/%9BB%B1%C4%C8%DF
+[INT] https://ygp4ph.me/%92%EDV%E6
+[INT] https://ygp4ph.me/assets/pdp.png
+[INT] https://ygp4ph.me/%DF%9E%E8%E8&%EE
+[INT] https://ygp4ph.me/styles.css
+[INT] https://ygp4ph.me/assets/bg1.jpg
+[INT] https://ygp4ph.me/assets/favi.png
+[INT] https://ygp4ph.me/B
+[INT] https://ygp4ph.me/index.html
+[INT] https://ygp4ph.me/portfolio.html
+[INT] https://ygp4ph.me/gallery.js
+[INT] https://ygp4ph.me/index.html#links
+[INT] https://ygp4ph.me#links
 ```
