@@ -47,7 +47,17 @@ func New(cfg Config) *Crawler {
 }
 
 // Start lance le crawler.
-func (c *Crawler) Start() error { return c.crawl(c.Config.TargetURL, 0) }
+func (c *Crawler) Start() error {
+	parsed, err := url.Parse(c.Config.TargetURL)
+	if err != nil {
+		return err
+	}
+	norm := parsed.String()
+	c.mu.Lock()
+	c.Visited[norm] = true
+	c.mu.Unlock()
+	return c.crawl(norm, 0)
+}
 
 // crawl effectue la recherche.
 func (c *Crawler) crawl(rawURL string, depth int) error {
@@ -58,19 +68,10 @@ func (c *Crawler) crawl(rawURL string, depth int) error {
 	if err != nil {
 		return err
 	}
-	norm := parsed.String()
 
-	c.mu.Lock()
-	if c.Visited[norm] {
-		c.mu.Unlock()
-		return nil
-	}
-	c.Visited[norm] = true
-	c.mu.Unlock()
-
-	resp, err := c.Client.Get(norm)
+	resp, err := c.Client.Get(rawURL)
 	if err != nil {
-		fmt.Printf("[%s] %s: %v\n", color.RedString("ERR"), norm, err)
+		fmt.Printf("[%s] %s: %v\n", color.RedString("ERR"), rawURL, err)
 		return nil
 	}
 	defer resp.Body.Close()
@@ -86,6 +87,15 @@ func (c *Crawler) crawl(rawURL string, depth int) error {
 			continue
 		}
 		abs := res.String()
+
+		c.mu.Lock()
+		if c.Visited[abs] {
+			c.mu.Unlock()
+			continue
+		}
+		c.Visited[abs] = true
+		c.mu.Unlock()
+
 		if res.Host != parsed.Host {
 			if !c.Config.OnlyInternal {
 				fmt.Printf("[%s] %s\n", color.CyanString("EXT"), abs)
