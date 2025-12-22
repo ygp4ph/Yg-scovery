@@ -52,33 +52,31 @@ go install
 ### Exemple
 
 ```text
-~/Projets/Yg-scovery $ ./yg-scovery -u https://ygp4ph.me -i
+~/CTF/HTB/en_cours $ ~/Projets/yg-scovery/yg-scovery -u ygp4ph.me -i
 
-_____.___.                  _________                                      
-\__  |   | ____            /   _____/ ____  _______  __ ___________ ___.__.
- /   |   |/ ___\   ______  \_____  \_/ ___\/  _ \  \/ // __ \_  __ <   |  |
- \____   / /_/  > /_____/  /        \  \__(  <_> )   /\  ___/|  | \/\___  |
- / ______\___  /          /_______  /\___  >____/ \_/  \___  >__|   / ____|
- \/     /_____/                   \/     \/                \/       \/      v2.0.1
+   __  ______ _      ______________ _   _____  _______  __
+  / / / / __ `/_____/ ___/ ___/ __ \ | / / _ \/ ___/ / / /
+ / /_/ / /_/ /_____(__  ) /__/ /_/ / |/ /  __/ /  / /_/ / 
+ \__, /\__, /     /____/\___/\____/|___/\___/_/   \__, /  
+/____//____/                                     /____/   v2.0.1
  
 [INF] Scanning https://ygp4ph.me (Depth: 3)
 [INF] Filter: Internal links only
 [INT] https://ygp4ph.me/assets/pdp_anime.mp4
-[INT] https://ygp4ph.me/T
-[INT] https://ygp4ph.me/%EE
-[INT] https://ygp4ph.me/%CD%BB%EB
-[INT] https://ygp4ph.me/%A6%BD
-[INT] https://ygp4ph.me/%9BB%B1%C4%C8%DF
-[INT] https://ygp4ph.me/%92%EDV%E6
 [INT] https://ygp4ph.me/assets/pdp.png
-[INT] https://ygp4ph.me/%DF%9E%E8%E8&%EE
+[INT] https://ygp4ph.me/
+[INT] https://ygp4ph.me/script.js
+[INT] https://ygp4ph.me/assets/rooftop.jpg
 [INT] https://ygp4ph.me/styles.css
-[INT] https://ygp4ph.me/assets/bg1.jpg
-[INT] https://ygp4ph.me/assets/favi.png
-[INT] https://ygp4ph.me/B
-[INT] https://ygp4ph.me/index.html
-[INT] https://ygp4ph.me/portfolio.html
-[INT] https://ygp4ph.me/gallery.js
-[INT] https://ygp4ph.me/index.html#links
 [INT] https://ygp4ph.me#links
+[INT] https://ygp4ph.me/assets/favi.png
+[INT] https://ygp4ph.me/Portfolio/
+[INT] https://ygp4ph.me/writeups/
+[INT] https://ygp4ph.me/writeups/writeups.css
+[INT] https://ygp4ph.me/writeups/chemistry/
+[INT] https://ygp4ph.me/writeups/trickster/
+[INT] https://ygp4ph.me/assets/labalsa.jpg
+[INT] https://ygp4ph.me/Portfolio/gallery.js
+[INT] https://ygp4ph.me/#links
+[INT] https://ygp4ph.me/writeups/trickster/image.png
 ```
