@@ -11,7 +11,6 @@ var (
 	attrRegex = regexp.MustCompile(`(href|src)=["']([^"']+)["']`)
 )
 
-// Extract extrait les liens d'une page web.
 func Extract(content string) []string {
 	seen := make(map[string]bool)
 	var found []string

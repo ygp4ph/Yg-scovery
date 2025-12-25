@@ -27,12 +27,11 @@ type Config struct {
 	ShowTree     bool
 }
 
-// Crawler représente un crawler web optimisé.
 type Crawler struct {
 	Config     Config
 	Client     *http.Client
 	FastClient *http.Client // Client rapide pour HEAD requests
-	Visited    sync.Map     // Map concurrente pour éviter les locks
+	Visited    sync.Map
 	Results    []string
 	resultsMu  sync.Mutex
 	wg         sync.WaitGroup
@@ -46,7 +45,6 @@ func New(cfg Config) *Crawler {
 		workers = 16
 	}
 
-	// Transport optimisé avec pool de connexions
 	transport := &http.Transport{
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 		MaxIdleConns:        100,
@@ -63,14 +61,13 @@ func New(cfg Config) *Crawler {
 			Transport: transport,
 		},
 		FastClient: &http.Client{
-			Timeout:   3 * time.Second, // Timeout court pour HEAD
+			Timeout:   3 * time.Second,
 			Transport: transport,
 		},
 		semaphore: make(chan struct{}, workers),
 	}
 }
 
-// Start lance le crawler.
 func (c *Crawler) Start() error {
 	parsed, err := url.Parse(c.Config.TargetURL)
 	if err != nil {
@@ -86,7 +83,6 @@ func (c *Crawler) Start() error {
 	return nil
 }
 
-// crawl explore récursivement les liens.
 func (c *Crawler) crawl(rawURL string, depth int) error {
 	if depth >= c.Config.MaxDepth {
 		return nil
@@ -153,7 +149,6 @@ type linkInfo struct {
 	isExternal bool
 }
 
-// validateLinksParallel valide plusieurs liens en parallèle.
 func (c *Crawler) validateLinksParallel(links []string, baseURL *url.URL) []linkInfo {
 	results := make(chan linkInfo, len(links))
 	var wg sync.WaitGroup
@@ -172,7 +167,6 @@ func (c *Crawler) validateLinksParallel(links []string, baseURL *url.URL) []link
 			abs := res.String()
 			isExternal := res.Host != baseURL.Host
 
-			// Optimization: Filtre avant validation réseau
 			if c.Config.OnlyInternal && isExternal {
 				return
 			}
@@ -197,9 +191,7 @@ func (c *Crawler) validateLinksParallel(links []string, baseURL *url.URL) []link
 	return validated
 }
 
-// validateLink vérifie qu'un lien est valide (avec cache).
 func (c *Crawler) validateLink(u string) bool {
-	// Vérifier le cache
 	if cached, ok := c.validCache.Load(u); ok {
 		return cached.(bool)
 	}
@@ -231,7 +223,6 @@ func (c *Crawler) addResult(url string) {
 	c.resultsMu.Unlock()
 }
 
-// SaveJSON sauvegarde les résultats en JSON.
 func (c *Crawler) SaveJSON() error {
 	if c.Config.OutputPath == "" {
 		return nil

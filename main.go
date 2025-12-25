@@ -113,7 +113,7 @@ func main() {
 	if err := c.Start(); err != nil {
 		log.Fatalf("%s %v", color.RedString("[FATAL] Crawler failed:"), err)
 	}
-	
+
 	if tree {
 		c.PrintTree()
 	}
