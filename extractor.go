@@ -11,6 +11,8 @@ var (
 	attrRegex = regexp.MustCompile(`(href|src)=["']([^"']+)["']`)
 )
 
+// Extract parses the provided content string and returns a slice of unique URLs found.
+// It uses regex to identify full URLs, absolute paths, and relative paths in attributes.
 func Extract(content string) []string {
 	seen := make(map[string]bool)
 	var found []string

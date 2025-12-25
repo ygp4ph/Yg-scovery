@@ -17,6 +17,7 @@ import (
 	"github.com/fatih/color"
 )
 
+// Config holds configuration parameters for the crawler.
 type Config struct {
 	TargetURL    string
 	MaxDepth     int
@@ -27,6 +28,7 @@ type Config struct {
 	ShowTree     bool
 }
 
+// Crawler represents the main crawler instance with its configuration and state.
 type Crawler struct {
 	Config     Config
 	Client     *http.Client
@@ -39,6 +41,7 @@ type Crawler struct {
 	semaphore  chan struct{}
 }
 
+// New creates and initializes a new Crawler instance with the given configuration.
 func New(cfg Config) *Crawler {
 	workers := runtime.NumCPU() * 4
 	if workers < 16 {
@@ -68,6 +71,7 @@ func New(cfg Config) *Crawler {
 	}
 }
 
+// Start initiates the crawling process starting from the target URL.
 func (c *Crawler) Start() error {
 	parsed, err := url.Parse(c.Config.TargetURL)
 	if err != nil {
@@ -223,6 +227,7 @@ func (c *Crawler) addResult(url string) {
 	c.resultsMu.Unlock()
 }
 
+// SaveJSON exports the crawling results (and tree if enabled) to a JSON file.
 func (c *Crawler) SaveJSON() error {
 	if c.Config.OutputPath == "" {
 		return nil
@@ -267,6 +272,7 @@ func newTreeNode(name string) *treeNode {
 	}
 }
 
+// PrintTree outputs the internal directory structure tree to stdout.
 func (c *Crawler) PrintTree() {
 	if !c.Config.ShowTree {
 		return
