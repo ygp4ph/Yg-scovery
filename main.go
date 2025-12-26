@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var Version = "v2.1.0"
+var Version = "v2.2.0"
 
 func main() {
 	var (

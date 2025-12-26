@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -49,7 +50,7 @@ func New(cfg Config) *Crawler {
 	}
 
 	transport := &http.Transport{
-		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: false}, // Default to secure
 		MaxIdleConns:        100,
 		MaxIdleConnsPerHost: 10,
 		MaxConnsPerHost:     20,
@@ -60,11 +61,11 @@ func New(cfg Config) *Crawler {
 	return &Crawler{
 		Config: cfg,
 		Client: &http.Client{
-			Timeout:   8 * time.Second,
+			Timeout:   60 * time.Second,
 			Transport: transport,
 		},
 		FastClient: &http.Client{
-			Timeout:   3 * time.Second,
+			Timeout:   30 * time.Second,
 			Transport: transport,
 		},
 		semaphore: make(chan struct{}, workers),
@@ -78,6 +79,12 @@ func (c *Crawler) Start() error {
 		return err
 	}
 	norm := parsed.String()
+
+	// Initial check for certificate errors
+	if err := c.checkConnection(norm); err != nil {
+		return err
+	}
+
 	c.Visited.Store(norm, true)
 
 	if err := c.crawl(norm, 0); err != nil {
@@ -85,6 +92,105 @@ func (c *Crawler) Start() error {
 	}
 	c.wg.Wait()
 	return nil
+}
+
+func (c *Crawler) checkConnection(targetURL string) error {
+	// Try HEAD first
+	err := c.doRequest(targetURL, "HEAD")
+	if err == nil {
+		return nil
+	}
+
+	// If HEAD failed with SSL error that was fixed by prompt, doRequest would have retried and succeeded or failed.
+	// If it failed with something else (like method allowed or timeout), try GET.
+	// We only fallback to GET if the error is NOT a user-aborted SSL check.
+	if strings.Contains(err.Error(), "aborted by user") {
+		return err
+	}
+
+	// Fallback to GET
+	if errGet := c.doRequest(targetURL, "GET"); errGet != nil {
+		return fmt.Errorf("connection failed (HEAD: %v, GET: %v)", err, errGet)
+	}
+	return nil
+}
+
+func (c *Crawler) doRequest(url, method string) error {
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.FastClient.Do(req)
+	if err != nil {
+		errStr := strings.ToLower(err.Error())
+		if strings.Contains(errStr, "x509") || strings.Contains(errStr, "certificate") || strings.Contains(errStr, "tls") || strings.Contains(errStr, "authority") {
+			// Check if we already enabled insecure mode to avoid double prompting
+			tr := c.FastClient.Transport.(*http.Transport)
+			if tr.TLSClientConfig.InsecureSkipVerify {
+				return err // Already insecure, yet failing on SSL? Real error.
+			}
+
+			if promptErr := c.promptInsecure(); promptErr != nil {
+				return promptErr
+			}
+			// Retry request with insecure client
+			reqRetry, errRetry := http.NewRequest(method, url, nil)
+			if errRetry != nil {
+				return errRetry
+			}
+			resp, err = c.FastClient.Do(reqRetry)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("page not found (404)")
+	}
+	if resp.StatusCode >= 400 && resp.StatusCode != http.StatusMethodNotAllowed {
+		return fmt.Errorf("target returned status %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
+	}
+	// If MethodNotAllowed, we return error so fallback can try GET (if we were doing HEAD)
+	if resp.StatusCode == http.StatusMethodNotAllowed {
+		return fmt.Errorf("method not allowed")
+	}
+
+	return nil
+}
+
+func (c *Crawler) promptInsecure() error {
+	fmt.Printf("%s The target has an invalid/self-signed certificate.\n", color.YellowString("[!]"))
+	fmt.Print("Do you want to proceed anyway? [Y/n]: ")
+
+	reader := bufio.NewReader(os.Stdin)
+	response, _ := reader.ReadString('\n')
+	response = strings.TrimSpace(response)
+	response = strings.ToLower(response)
+
+	if response == "" || response == "y" || response == "yes" {
+		c.enableInsecure()
+		return nil
+	}
+	return fmt.Errorf("aborted by user: certificate verification failed")
+}
+
+func (c *Crawler) enableInsecure() {
+	transport := &http.Transport{
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+		MaxIdleConns:        100,
+		MaxIdleConnsPerHost: 10,
+		MaxConnsPerHost:     20,
+		IdleConnTimeout:     30 * time.Second,
+		DisableKeepAlives:   false,
+	}
+	c.Client.Transport = transport
+	c.FastClient.Transport = transport
+	color.Yellow("[WRN] SSL verification disabled")
 }
 
 func (c *Crawler) crawl(rawURL string, depth int) error {
